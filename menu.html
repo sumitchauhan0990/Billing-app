@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Billing Pro</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a0f;
+        --surface: #13131a;
+        --card: #1c1c27;
+        --border: #2a2a3d;
+        --accent: #f5a623;
+        --accent2: #e8541a;
+        --text: #f0f0f5;
+        --muted: #7a7a9a;
+        --danger: #e05555;
+        --success: #3ec97e;
+        --radius: 14px;
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 0;
+      }
+
+      /* ─── HEADER ─── */
+      header {
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 60%,
+          #0f3460 100%
+        );
+        padding: 28px 40px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .logo-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        box-shadow: 0 4px 20px rgba(245, 166, 35, 0.35);
+      }
+
+      .logo-text h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 22px;
+        color: var(--accent);
+        letter-spacing: 0.5px;
+      }
+
+      .logo-text p {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-top: 2px;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .date-chip {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        padding: 7px 16px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      /* ─── MAIN LAYOUT ─── */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 24px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 24px;
+        align-items: start;
+      }
+
+      /* ─── CARD ─── */
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .card-title {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--muted);
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ─── SEARCH + ADD FORM ─── */
+      .search-wrapper {
+        position: relative;
+        margin-bottom: 14px;
+      }
+
+      .search-wrapper input {
+        width: 100%;
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        padding: 13px 16px 13px 42px;
+        font-size: 15px;
+        font-family: "DM Sans", sans-serif;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      .search-wrapper input:focus {
+        border-color: var(--accent);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+        font-size: 16px;
+      }
+
+      #suggestions {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        right: 0;
+        background: #1e1e2d;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        z-index: 200;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+        max-height: 260px;
+        overflow-y: auto;
+      }
+
+      #suggestions:empty {
+        display: none;
+      }
+
+      .suggestion-item {
+        padding: 11px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        transition: background 0.15s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .suggestion-item:last-child {
+        border-bottom: none;
+      }
+
+      .suggestion-item:hover {
+        background: rgba(245, 166, 35, 0.12);
+        color: var(--accent);
+      }
+
+      .suggestion-price {
+        margin-left: auto;
+        font-size: 13px;
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      label {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 6px;
+      }
+
+      select,
+      input[type="number"] {
+        width: 100%;
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        padding: 12px 14px;
+        font-size: 14px;
+        font-family: "DM Sans", sans-serif;
+        outline: none;
+        transition: border-color 0.2s;
+        -webkit-appearance: none;
+      }
+
+      select:focus,
+      input[type="number"]:focus {
+        border-color: var(--accent);
+      }
+
+      .btn-add {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        font-family: "DM Sans", sans-serif;
+        cursor: pointer;
+        letter-spacing: 0.5px;
+        transition: opacity 0.2s, transform 0.1s;
+        box-shadow: 0 4px 20px rgba(245, 166, 35, 0.3);
+      }
+
+      .btn-add:hover {
+        opacity: 0.9;
+      }
+      .btn-add:active {
+        transform: scale(0.98);
+      }
+
+      /* ─── BILL TABLE ─── */
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 14px;
+      }
+
+      thead th {
+        background: var(--surface);
+        color: var(--muted);
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        padding: 13px 14px;
+        font-weight: 500;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+      }
+
+      thead th:first-child {
+        border-radius: 8px 0 0 8px;
+      }
+      thead th:last-child {
+        border-radius: 0 8px 8px 0;
+        text-align: center;
+      }
+
+      tbody tr {
+        transition: background 0.15s;
+      }
+
+      tbody tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      tbody td {
+        padding: 13px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        vertical-align: middle;
+      }
+
+      tbody td:last-child {
+        text-align: center;
+      }
+
+      .item-name {
+        font-weight: 500;
+        text-transform: capitalize;
+      }
+
+      .type-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      .type-single {
+        background: rgba(62, 201, 126, 0.12);
+        color: var(--success);
+      }
+      .type-half {
+        background: rgba(245, 166, 35, 0.12);
+        color: var(--accent);
+      }
+      .type-full {
+        background: rgba(224, 85, 85, 0.12);
+        color: var(--danger);
+      }
+
+      .price-col {
+        color: var(--muted);
+      }
+      .total-col {
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .btn-remove {
+        background: rgba(224, 85, 85, 0.12);
+        border: 1px solid rgba(224, 85, 85, 0.25);
+        color: var(--danger);
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .btn-remove:hover {
+        background: rgba(224, 85, 85, 0.25);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: var(--muted);
+      }
+
+      .empty-state .empty-icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+      }
+      .empty-state p {
+        font-size: 14px;
+      }
+
+      /* ─── RIGHT PANEL ─── */
+      .summary-card {
+        position: sticky;
+        top: 100px;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 11px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 14px;
+      }
+
+      .summary-row:last-of-type {
+        border-bottom: none;
+      }
+      .summary-row .label2 {
+        color: var(--muted);
+      }
+
+      .grand-total-box {
+        background: linear-gradient(
+          135deg,
+          rgba(245, 166, 35, 0.12),
+          rgba(232, 84, 26, 0.08)
+        );
+        border: 1px solid rgba(245, 166, 35, 0.25);
+        border-radius: 12px;
+        padding: 18px 20px;
+        margin: 20px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .grand-total-box .gt-label {
+        font-size: 13px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+      }
+
+      .grand-total-box .gt-amount {
+        font-family: "Playfair Display", serif;
+        font-size: 30px;
+        color: var(--accent);
+      }
+
+      .action-btns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .btn-secondary {
+        padding: 12px;
+        border-radius: 10px;
+        border: 1.5px solid var(--border);
+        background: transparent;
+        color: var(--text);
+        font-size: 13px;
+        font-family: "DM Sans", sans-serif;
+        cursor: pointer;
+        font-weight: 500;
+        transition: border-color 0.2s, background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--muted);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .btn-print {
+        padding: 12px;
+        border-radius: 10px;
+        border: none;
+        background: var(--surface);
+        color: var(--text);
+        font-size: 13px;
+        font-family: "DM Sans", sans-serif;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        grid-column: span 2;
+        background: linear-gradient(135deg, #1e3a5f, #0f3460);
+        border: 1px solid #1a4a7a;
+        box-shadow: 0 4px 20px rgba(15, 52, 96, 0.4);
+      }
+
+      .btn-print:hover {
+        opacity: 0.88;
+      }
+
+      /* ─── STATS ─── */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .stat-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 16px;
+      }
+
+      .stat-box .stat-val {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .stat-box .stat-lbl {
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 2px;
+      }
+
+      /* ─── TOAST ─── */
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px 20px;
+        font-size: 14px;
+        color: var(--text);
+        box-shadow: var(--shadow);
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 0.3s;
+        z-index: 999;
+        pointer-events: none;
+      }
+
+      #toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ─── PRINT ─── */
+      @media print {
+        body {
+          background: white;
+          color: black;
+        }
+        header,
+        .action-btns,
+        .btn-remove,
+        .card-title,
+        label,
+        .search-wrapper,
+        .row2,
+        .btn-add,
+        #toast {
+          display: none !important;
+        }
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .card {
+          border: 1px solid #ccc;
+          box-shadow: none;
+        }
+        .grand-total-box {
+          background: #f9f9f9;
+          border: 2px solid #333;
+        }
+        .grand-total-box .gt-amount {
+          color: #e67e00;
+        }
+        thead th {
+          background: #eee;
+          color: #333;
+        }
+        tbody td {
+          color: #111;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .summary-card {
+          position: static;
+        }
+        header {
+          padding: 18px 20px;
+        }
+        .container {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <div class="logo-icon">🍽️</div>
+        <div class="logo-text">
+          <h1>Smart Billing Pro</h1>
+          <p>Restaurant POS System</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="date-chip" id="dateChip"></div>
+      </div>
+    </header>
+
+    <div id="toast"></div>
+
+    <div class="container">
+      <div class="layout">
+        <!-- LEFT: Add Item + Bill Table -->
+        <div>
+          <div class="card" style="margin-bottom: 20px">
+            <div class="card-title">✦ New Item</div>
+
+            <div class="search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input
+                type="text"
+                id="item"
+                placeholder="Item search karein..."
+                onkeyup="showSuggestions()"
+                autocomplete="off"
+              />
+              <div id="suggestions"></div>
+            </div>
+
+            <div class="row2">
+              <div>
+                <label>Type</label>
+                <select id="type">
+                  <option value="single">Single</option>
+                  <option value="half">Half</option>
+                  <option value="full">Full</option>
+                </select>
+              </div>
+              <div>
+                <label>Quantity</label>
+                <input type="number" id="qty" placeholder="0" min="1" />
+              </div>
+            </div>
+
+            <button class="btn-add" onclick="addItem()">
+              + Item Add Karen
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">📋 Bill Details</div>
+            <div class="table-wrap">
+              <table id="billTable">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                    <th>Remove</th>
+                  </tr>
+                </thead>
+                <tbody id="billBody">
+                  <tr id="emptyRow">
+                    <td colspan="6">
+                      <div class="empty-state">
+                        <div class="empty-icon">🧾</div>
+                        <p>Koi item nahi hai. Upar se item add karein.</p>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Summary -->
+        <div class="summary-card">
+          <div class="card">
+            <div class="card-title">📊 Stats</div>
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-val" id="statItems">0</div>
+                <div class="stat-lbl">Total Items</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" id="statQty">0</div>
+                <div class="stat-lbl">Total Qty</div>
+              </div>
+            </div>
+
+            <div class="card-title">💰 Summary</div>
+
+            <div class="summary-row">
+              <span class="label2">Subtotal</span>
+              <span>₹ <span id="subtotal">0</span></span>
+            </div>
+            <div class="summary-row">
+              <span class="label2">GST (0%)</span>
+              <span>₹ 0</span>
+            </div>
+            <div class="summary-row">
+              <span class="label2">Discount</span>
+              <span>₹ 0</span>
+            </div>
+
+            <div class="grand-total-box">
+              <div>
+                <div class="gt-label">Grand Total</div>
+              </div>
+              <div class="gt-amount">₹ <span id="grandTotal">0</span></div>
+            </div>
+
+            <div class="action-btns">
+              <button class="btn-secondary" onclick="clearBill()">
+                🗑️ Clear
+              </button>
+              <button class="btn-secondary" onclick="undoLast()">
+                ↩️ Undo
+              </button>
+              <button class="btn-print" onclick="window.print()">
+                🖨️ Bill Print Karen
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Date
+      const d = new Date();
+      document.getElementById("dateChip").textContent = d.toLocaleDateString(
+        "hi-IN",
+        { weekday: "long", year: "numeric", month: "long", day: "numeric" }
+      );
+
+      // ─── MENU ───
+      const menu = {
+        "aloo pyaz paratha": 50,
+        "aloo paratha": 50,
+        "palak cheese paratha": 90,
+        "aloo cheese paratha": 70,
+        "gobhi paratha": 70,
+        "mix paratha": 80,
+        "paneer pyaz paratha": 100,
+        "paneer paratha": 80,
+        "cheese paratha": 120,
+        "gobhi cheese paratha": 100,
+        "2 plain paratha": 50,
+        "2 plain paratha + chole": 150,
+        "2 plain paratha + egg bhurji": 100,
+        "chicken paratha": 160,
+        "egg paratha": 80,
+        "chicken cheese paratha": 180,
+        "chicken egg paratha": 130,
+        "egg cheese paratha": 110,
+        "paneer egg paratha": 110,
+        "peri peri fries": 170,
+        "cheese peri peri fries": 190,
+        "paneer peri peri fries": 180,
+        "masala fries": 140,
+        "chole kulche": 50,
+        "butter chole kulche": 60,
+        "paneer chole kulche": 70,
+        "amritsari chole kulche": 80,
+        "vada pav": 80,
+        "white sauce pasta": 170,
+        "red sauce pasta": 170,
+        "mix sauce pasta": 170,
+        "chicken pasta": 250,
+        "cheese pasta": 220,
+        "chole rice": 70,
+        "rajma rice": 70,
+        "chhole bhature": 80,
+        "aloo pyaz sandwich": 50,
+        "aloo sandwich": 70,
+        "cheese corn sandwich": 70,
+        "paneer sandwich": 70,
+        "pizza sandwich": 90,
+        "mix sandwich": 80,
+        "paneer cheese sandwich": 90,
+        "egg sandwich": 70,
+        "egg cheese sandwich": 80,
+        "chicken sandwich": 90,
+        "chicken cheese sandwich": 100,
+        "bread omelette": 50,
+        "brown bread omelette": 60,
+        "plain omelette": 50,
+        "cheese omelette": 60,
+        "paneer cheese omelette": 80,
+        "chicken cheese omelette": 90,
+        "egg bhurji": 50,
+        "paneer bhurji": 100,
+        "veg roll": 50,
+        "mix veg roll": 90,
+        "cheese roll": 90,
+        "egg roll": 60,
+        "double egg roll": 70,
+        "egg cheese roll": 90,
+        "chicken roll": 130,
+        "chicken cheese roll": 150,
+        "chicken kathi roll": 140,
+        "paneer roll": 120,
+        "paneer kathi roll": 130,
+        "paneer cheese roll": 140,
+        "paneer tikka roll": 140,
+        "paneer tikka cheese roll": 160,
+        "chicken tikka roll": 140,
+        "malai chicken tikka roll": 150,
+        "chicken keema roll": 130,
+        "chicken keema cheese roll": 140,
+        "chicken kabab roll": 120,
+        "chicken kabab cheese roll": 130,
+        "chowmin roll": 90,
+        "chicken chowmin roll": 110,
+        "egg chowmin roll": 100,
+        "veg tandoori momos": 130,
+        "paneer tandoori momos": 140,
+        "chicken tandoori momos": 150,
+        "momos roll": { half: 90, full: 120 },
+        "kurkure momos roll": { half: 110, full: 130 },
+        "tandoori momos roll": { half: 120, full: 140 },
+        "soya chaap": { half: 140, full: 250 },
+        "malai chaap": { half: 140, full: 250 },
+        "masala chaap": { half: 140, full: 250 },
+        "afghani chaap": { half: 140, full: 250 },
+        "chicken tikka": { half: 170, full: 270 },
+        "malai chicken tikka": { half: 170, full: 270 },
+      };
+
+      let totalAmount = 0;
+      let itemCount = 0;
+      let totalQty = 0;
+      let lastRow = null;
+      let lastItemData = null;
+
+      function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2500);
+      }
+
+      function getPrice(item, type) {
+        const pd = menu[item];
+        if (!pd) return null;
+        if (typeof pd === "object") return pd[type] || null;
+        return pd;
+      }
+
+      function showSuggestions() {
+        const input = document
+          .getElementById("item")
+          .value.toLowerCase()
+          .trim();
+        const box = document.getElementById("suggestions");
+        box.innerHTML = "";
+        if (!input) return;
+
+        const matches = Object.keys(menu).filter((k) => k.includes(input));
+        matches.slice(0, 8).forEach((item) => {
+          const pd = menu[item];
+          const priceStr =
+            typeof pd === "object" ? `₹${pd.half} / ₹${pd.full}` : `₹${pd}`;
+
+          const div = document.createElement("div");
+          div.className = "suggestion-item";
+          div.innerHTML = `<span>🍴</span><span style="text-transform:capitalize">${item}</span><span class="suggestion-price">${priceStr}</span>`;
+          div.onclick = () => {
+            document.getElementById("item").value = item;
+            box.innerHTML = "";
+            document.getElementById("qty").focus();
+          };
+          box.appendChild(div);
+        });
+      }
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".search-wrapper"))
+          document.getElementById("suggestions").innerHTML = "";
+      });
+
+      document.getElementById("item").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") addItem();
+      });
+
+      document.getElementById("qty").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") addItem();
+      });
+
+      function updateStats() {
+        document.getElementById("statItems").textContent = itemCount;
+        document.getElementById("statQty").textContent = totalQty;
+        document.getElementById("subtotal").textContent = totalAmount;
+        document.getElementById("grandTotal").textContent = totalAmount;
+      }
+
+      function addItem() {
+        const itemName = document
+          .getElementById("item")
+          .value.toLowerCase()
+          .trim();
+        const qty = parseInt(document.getElementById("qty").value);
+        const type = document.getElementById("type").value;
+
+        if (!menu[itemName]) {
+          showToast("❌ Item menu mein nahi hai!");
+          return;
+        }
+        if (!qty || qty <= 0) {
+          showToast("⚠️ Sahi quantity dalein!");
+          return;
+        }
+
+        const pd = menu[itemName];
+        let price, displayType;
+
+        if (typeof pd === "object") {
+          price = pd[type];
+          if (!price) {
+            showToast(`⚠️ Is item ka "${type}" type nahi hai!`);
+            return;
+          }
+          displayType = type;
+        } else {
+          price = pd;
+          displayType = "single";
+        }
+
+        const itemTotal = price * qty;
+        totalAmount += itemTotal;
+        itemCount++;
+        totalQty += qty;
+
+        // Remove empty state
+        const emptyRow = document.getElementById("emptyRow");
+        if (emptyRow) emptyRow.remove();
+
+        const tbody = document.getElementById("billBody");
+        const row = tbody.insertRow();
+        row.style.animation = "fadeIn 0.3s ease";
+
+        const badgeClass = `type-${displayType}`;
+
+        row.innerHTML = `
+      <td class="item-name">${itemName}</td>
+      <td><span class="type-badge ${badgeClass}">${displayType}</span></td>
+      <td class="price-col">₹${price}</td>
+      <td>${qty}</td>
+      <td class="total-col">₹${itemTotal}</td>
+      <td><button class="btn-remove" title="Remove">✕</button></td>
+    `;
+
+        const removeBtn = row.querySelector(".btn-remove");
+        removeBtn.onclick = () => {
+          totalAmount -= itemTotal;
+          itemCount--;
+          totalQty -= qty;
+          row.remove();
+          if (document.getElementById("billBody").rows.length === 0)
+            addEmptyState();
+          updateStats();
+          showToast("🗑️ Item remove kar diya");
+        };
+
+        lastRow = row;
+        lastItemData = { itemTotal, qty };
+
+        updateStats();
+        showToast(`✅ ${itemName} add ho gaya!`);
+
+        document.getElementById("item").value = "";
+        document.getElementById("qty").value = "";
+        document.getElementById("item").focus();
+      }
+
+      function undoLast() {
+        if (!lastRow) {
+          showToast("↩️ Koi item undo karne ke liye nahi hai");
+          return;
+        }
+        totalAmount -= lastItemData.itemTotal;
+        totalQty -= lastItemData.qty;
+        itemCount--;
+        lastRow.remove();
+        lastRow = null;
+        lastItemData = null;
+        if (document.getElementById("billBody").rows.length === 0)
+          addEmptyState();
+        updateStats();
+        showToast("↩️ Last item undo ho gaya");
+      }
+
+      function addEmptyState() {
+        const tbody = document.getElementById("billBody");
+        const tr = document.createElement("tr");
+        tr.id = "emptyRow";
+        tr.innerHTML = `<td colspan="6">
+      <div class="empty-state">
+        <div class="empty-icon">🧾</div>
+        <p>Koi item nahi hai. Upar se item add karein.</p>
+      </div></td>`;
+        tbody.appendChild(tr);
+      }
+
+      function clearBill() {
+        if (!confirm("Kya aap bill clear karna chahte hain?")) return;
+        document.getElementById("billBody").innerHTML = "";
+        totalAmount = 0;
+        itemCount = 0;
+        totalQty = 0;
+        lastRow = null;
+        lastItemData = null;
+        addEmptyState();
+        updateStats();
+        showToast("🗑️ Bill clear ho gaya");
+      }
+
+      // Fade in animation
+      const style = document.createElement("style");
+      style.textContent = `@keyframes fadeIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:none; } }`;
+      document.head.appendChild(style);
+    </script>
+  </body>
+</html>
